@@ -16,12 +16,13 @@ public class Input {
     }
 
     public String getString() {
-        String userInput = scanner.next();
+        String userInput = scanner.nextLine();
         return userInput;
     }
 
     public boolean yesNo(String prompt) {
-        String userInput = scanner.next();
+        System.out.println(prompt);
+        String userInput = getString();
         if(userInput.equalsIgnoreCase("y") || userInput.equalsIgnoreCase("yes")) {
             return true;
         }else {
