@@ -12,14 +12,17 @@ public class ContactsManager {
     static Path fileDirectory = Paths.get("src/", fileName);
     static List<String> fileContent = null;
     static Input input  = new Input();
+    static ArrayList<Contact> contactsList = new ArrayList<>();
+
 
     public static void main(String[] args) {
 
-        if (Files.exists(fileDirectory)) {
-            System.out.println("the file can be found");
-        }
+//        if (Files.exists(fileDirectory)) {
+//            System.out.println("the file can be found");
+//        }
         int userInput = 0;
         do {
+            loadContacts();
             showOptions();
             userInput = input.getInt(1,5);
             if (userInput == 1) {
@@ -39,6 +42,7 @@ public class ContactsManager {
             }
             input.getString("Press Enter to continue...");
             }while (true);
+
         System.exit(0);
     }
 
@@ -52,28 +56,33 @@ public class ContactsManager {
                 "Enter an option (1, 2, 3, 4 or 5):\n> ");
     }
 
-    public static void showContacts() {
-        Path contactsPath = fileDirectory;
-        try {
-            fileContent = Files.readAllLines(contactsPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (String contact: fileContent) {
-            System.out.println(contact);
-        }
-
-    }
-
-    public static void addContact(){
-        Path contactsPath = fileDirectory;
+    public static void loadContacts() {
         try {
             fileContent = Files.readAllLines(fileDirectory);
         } catch (IOException e){
             System.out.println("file can't be read");
         }
-        System.out.println("Please enter a name and phone number: ");
+        for(String line : fileContent){
+            contactsList.add(createContact(line));
+        }
 
+    }
+
+    public static void showContacts() {
+        System.out.printf("%-18s | %s", "Name", "Phone Number\n");
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _\n");
+        for (Contact contact: contactsList) {
+//            System.out.println(contact.first + " " + contact.last + " " + contact.phone);
+            System.out.printf("%-9s %-9s %s%n", contact.first, contact.last, contact.phone);
+        }
+
+    }
+
+    public static void addContact(){
+        System.out.println("Please enter a name and phone number: ");
+        for(String line : fileContent){
+            contactsList.add(createContact(line));
+        }
         fileContent.add(input.getString());
 
         try {
@@ -84,12 +93,6 @@ public class ContactsManager {
     }
 
     public static void searchContacts() {
-        Path contactsPath = fileDirectory;
-        try {
-            fileContent = Files.readAllLines(fileDirectory);
-        } catch (IOException e){
-            System.out.println("file can't be read");
-        }
 
         String userInput = input.getString();
         for(String contact: fileContent) {
@@ -100,12 +103,6 @@ public class ContactsManager {
     }
 
     public static void deleteContact(){
-        Path contactsPath = fileDirectory;
-        try {
-            fileContent = Files.readAllLines(fileDirectory);
-        } catch (IOException e){
-            System.out.println("file can't be read");
-        }
 
         String userInput = input.getString();
         ArrayList<String> newContent = new ArrayList<String>();
@@ -124,5 +121,29 @@ public class ContactsManager {
 
         // accept input from user to which contact to delete
     }
-}
 
+    public static void writeToFile(){
+
+    }
+    public static Contact createContact(String x) {
+        String[] split = x.split(" ");
+
+        Contact contact = new Contact(split[0],split[1],split[2]);
+        return contact;
+    }
+
+}//end contactsmanager class
+
+class Contact {
+        String first;
+        String last;
+        String phone;
+
+
+        public Contact(String first, String last, String phone) {
+            this.first = first;
+            this.last = last;
+            this.phone = phone;
+        }
+
+}
