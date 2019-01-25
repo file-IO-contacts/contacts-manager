@@ -2,7 +2,7 @@
 -  ☑ Strings
 -  ☑ variables
 -  ☑ arithmetic expressions
--  ☐ casting
+-  ☑ casting (implicit)
 -  ☑ scanner class
 -  ☑ logical operators
 -  ☑ string comparison
@@ -19,15 +19,16 @@
 -  ☑ constructors
 -  ☑ "this" keyword
 -  ☑ arrays
--  ☑ polymorphism
+-  ☑? polymorphism
 -  ☑ iterating
 -  ☑ inheritance
 -  ☑ extending 
 -  ☑ interface
+-  ☑ implementing
 -  ☑ abstract
 -  ☑ super
 -  ☑ final
--  ☑ collections - list -> arraylist hashmap
+-  ☑ collections - list -> arraylist/hashmap
 -  ☑ exceptions
 
 

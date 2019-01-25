@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Actions implements ActionsInterface {
     static List<String> fileContent = null;
@@ -17,9 +18,17 @@ public class Actions implements ActionsInterface {
 
     public void loadContacts() {
         try {
+            if(Files.notExists(fileDirectory)) {
+                System.out.println("Contacts file not found, creating file...");
+                TimeUnit.SECONDS.sleep(6);
+                Files.createFile(fileDirectory); // similar to "touch" on the cli
+                System.out.println("File successfully created!");
+            }
             fileContent = Files.readAllLines(fileDirectory);
         } catch (IOException e){
             System.out.println("file can't be read");
+        } catch (InterruptedException e){
+            System.out.println("file creation failed");
         }
         for(String line : fileContent){
             contactsList.add(createContact(line));
@@ -27,7 +36,7 @@ public class Actions implements ActionsInterface {
     }
 
     public void showOptions(){
-        System.out.print("\n" +
+        System.out.print("" +
                 "1. View contacts.\n" +
                 "2. Add a new contact.\n" +
                 "3. Search a contact by name.\n" +
@@ -37,11 +46,15 @@ public class Actions implements ActionsInterface {
     }
 
     public void showContacts() {
-        System.out.printf("%-12s | %s", "Name", "Phone Number\n");
-        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ __\n");
-        for (Person contact: contactsList) {
+        if (contactsList.size() != 0) {
+            System.out.printf("%-12s | %s", "Name", "Phone Number\n");
+            System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _\n");
+            for (Person contact : contactsList) {
 //            System.out.println(contact.first + " " + contact.last + " " + contact.phone);
-            System.out.printf("%-12s | %s\n", contact.first+" "+contact.last, contact.phone);
+                System.out.printf("%-12s | %s\n", contact.first + " " + contact.last, contact.phone);
+            }
+        }else {
+            System.out.println("Contacts list is empty. Try adding a contact.");
         }
 
     }
@@ -52,42 +65,52 @@ public class Actions implements ActionsInterface {
     }
 
     public void searchContacts() {
-        int numOfFound = 0;
-        String userInput = input.getString("Enter a name or phone number");
-        for(Person contact: contactsList) {
-            if(contact.contains(userInput)) {
-                System.out.printf("%s %s %s\n",contact.first, contact.last, contact.phone);
-                numOfFound++;
+        if (contactsList.size() != 0) {
+            int numOfFound = 0;
+            String userInput = input.getString("Enter a name or phone number");
+            for (Person contact : contactsList) {
+                if (contact.contains(userInput)) {
+                    System.out.printf("%s %s %s\n", contact.first, contact.last, contact.phone);
+                    numOfFound++;
+                }
             }
-        }
-        if(numOfFound == 0){
-            System.out.println("No matches found.");
+            if (numOfFound == 0) {
+                System.out.println("No matches found.");
+            }
+
+        }else {
+            System.out.println("Contacts list is empty. Try adding a contact.");
         }
     }
 
     public void deleteContact(){
-        int numOfFound = 0;
-        String userInput = input.getString("Enter a name or phone number to delete");
-        ArrayList<Person> newContent = new ArrayList<>();
-        for(Person contact: contactsList) {
-            if(contact.contains(userInput)) {
-                System.out.printf("%s %s %s\n",contact.first, contact.last, contact.phone);
-                numOfFound++;
-                continue;
+        if (contactsList.size() != 0) {
+            int numOfFound = 0;
+            String userInput = input.getString("Enter a name or phone number to delete");
+            ArrayList<Person> newContent = new ArrayList<>();
+            for (Person contact : contactsList) {
+                if (contact.contains(userInput)) {
+                    System.out.printf("%s %s %s\n", contact.first, contact.last, contact.phone);
+                    numOfFound++;
+                    continue;
+                }
+                newContent.add(contact);
             }
-            newContent.add(contact);
+
+            if (numOfFound != 0) {
+                if (input.yesNo("Do you wish to delete the " + numOfFound + " contact(s) above?")) {
+                    contactsList = newContent;
+                    System.out.println("Contact(s) deleted");
+                } else {
+                    System.out.println("Delete aborted");
+                }
+            } else {
+                System.out.println("No matches found.");
+            }
+        } else {
+            System.out.println("Contacts list is empty. Try adding a contact.");
         }
 
-        if(numOfFound != 0){
-            if (input.yesNo("Do you wish to delete the "+ numOfFound+ " contact(s) above?")){
-                contactsList = newContent;
-                System.out.println("Contacts deleted");
-            }else {
-                System.out.println("Delete aborted");
-            }
-        }else {
-            System.out.println("No matches found.");
-        }
         // accept input from user to which contact to delete
     }
 
